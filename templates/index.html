@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>输入处理</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                display: flex;
+                padding: 2rem;
+            }
+
+            .sidebar {
+                width: 20%;
+                margin-right: 2rem;
+            }
+
+            .main-content {
+                width: 80%;
+                background-color: white;
+                padding: 2rem;
+                border-radius: 1rem;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            h1 {
+                color: #e62e78;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+
+            form {
+                display: flex;
+                flex-direction: column;
+            }
+
+            textarea {
+                border: 1px solid #ddd;
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                resize: vertical;
+                min-height: 100px;
+            }
+
+            button {
+                background-color: #e62e78;
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                padding: 0.8rem 1.5rem;
+                cursor: pointer;
+                transition: background-color 0.3s;
+                /* 确保按钮宽度一致 */
+                width: fit-content; 
+            }
+
+            button:hover {
+                background-color: #d1296d;
+            }
+
+            .result {
+                margin-top: 2rem;
+                padding: 1rem;
+                background-color: #f8f9fa;
+                border-radius: 0.5rem;
+                white-space: pre-wrap;
+            }
+
+            /* 新增小红书风格链接样式 */
+            .xhs-link {
+                display: inline-block;
+                padding: 0.5rem 1rem;
+                background-color: #e62e78;
+                color: white;
+                border-radius: 1.5rem;
+                text-decoration: none;
+                font-size: 0.9rem;
+                transition: background-color 0.3s;
+            }
+
+            .xhs-link:hover {
+                background-color: #d1296d;
+            }
+
+            /* 垃圾桶按钮样式 */
+            .delete-btn {
+                background: none;
+                border: none;
+                padding: 0;
+                margin-left: 10px;
+                cursor: pointer;
+            }
+            .delete-btn svg {
+                fill: #e62e78;
+                width: 16px;
+                height: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <h3>选择任务</h3>
+            {% for index, key in enumerate(task_keys) %}
+                <label>
+                    <input type="radio" name="task_index" value="{{ index }}" {% if loop.first %}checked{% endif %} onchange="updateTaskIndex(this.value)">
+                    {{ key }}
+                    <!-- 添加删除按钮 -->
+                    <button class="delete-btn" onclick="deleteTask({{ index }})">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                    </button>
+                </label><br>
+            {% endfor %}
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <!-- 移动添加任务链接到此处 -->
+            <a href="{{ url_for('add_task') }}" class="xhs-link">添加任务</a><br>
+        </div>
+        <div class="main-content">
+            <h1>输入处理</h1>
+            <form method="post">
+                <!-- 添加隐藏输入字段 -->
+                <input type="hidden" name="selected_task_index" id="selected_task_index" value="{% if task_keys %}{{ 0 }}{% endif %}">
+                <textarea name="input_text" placeholder="请输入文字"></textarea>
+                <button type="submit">发送</button>
+            </form>
+            {% if result %}
+                <div class="result">
+                    <strong>处理结果:</strong>
+                    <p id="result-text">{{ result }}</p>
+                    <!-- 保留复制按钮 -->
+                    <button type="button" id="copy-btn" onclick="copyResult()">复制结果</button> 
+                </div>
+            {% endif %}
+        </div>
+        <script>
+            function copyResult() {
+                const resultText = document.getElementById('result-text');
+                const textArea = document.createElement('textarea');
+                textArea.value = resultText.textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            }
+
+            // 新增函数，用于更新隐藏字段的值
+            function updateTaskIndex(index) {
+                document.getElementById('selected_task_index').value = index;
+            }
+
+            // 新增删除任务函数
+            function deleteTask(index) {
+                if (confirm('确定要删除这个任务吗？')) {
+                    // 这里需要根据后端接口实现实际的删除逻辑
+                    // 示例：使用 fetch 发送删除请求
+                    fetch(`/delete_task/${index}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                   .then(response => {
+                        if (response.ok) {
+                            // 删除成功后可以刷新页面或者更新任务列表
+                            location.reload();
+                        } else {
+                            alert('删除任务失败');
+                        }
+                    })
+                   .catch(error => {
+                        console.error('删除任务时发生错误:', error);
+                        alert('删除任务时发生错误');
+                    });
+                }
+            }
+
+            // 页面加载完成后自动执行复制操作
+            window.onload = async function() {
+                
+                await copyResult();
+                
+            };
+        </script>
+    </body>
+</html>
