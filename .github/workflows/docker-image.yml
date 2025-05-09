@@ -17,7 +17,7 @@ jobs:
       id-token: write
     steps:
       - name: change config
-        run: ls -a && pwd && sed -i '$d' config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> config.yaml
+        run: sed -i '$d' `pwd`/config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> `pwd`/config.yaml
     
       - name: Check out the repo
         uses: actions/checkout@v4
