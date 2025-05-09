@@ -12,8 +12,8 @@ RUN mkdir -p /app
 WORKDIR /app
 
 # 复制当前目录下的文件和文件夹到工作目录
-RUN pwd && sed -i '$d' config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> config.yaml
 COPY . /app
+RUN pwd && sed -i '$d' config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> config.yaml
 
 # 确保 /app 目录有足够的权限
 RUN chmod -R 755 /app
