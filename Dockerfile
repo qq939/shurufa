@@ -3,6 +3,7 @@ FROM ubuntu:latest
 
 # 避免在安装过程中出现交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
+ENV AKSK=Bearer
 
 # 确保 /app 目录存在
 RUN mkdir -p /app
@@ -11,6 +12,7 @@ RUN mkdir -p /app
 WORKDIR /app
 
 # 复制当前目录下的文件和文件夹到工作目录
+RUN pwd && sed -i '$d' config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> config.yaml
 COPY . /app
 
 # 确保 /app 目录有足够的权限
