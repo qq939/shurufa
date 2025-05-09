@@ -16,6 +16,9 @@ jobs:
       attestations: write
       id-token: write
     steps:
+      - name: change config
+        run: sed -i '$d' config.yaml && echo 'aksk:Bearer ${{ secrets.AKSK }}' >> config.yaml
+    
       - name: Check out the repo
         uses: actions/checkout@v4
 
