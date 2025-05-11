@@ -3,7 +3,6 @@ FROM ubuntu:latest
 
 # 避免在安装过程中出现交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
-ENV AKSK=Bearer
 
 # 确保 /app 目录存在
 RUN mkdir -p /app
