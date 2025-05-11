@@ -1,6 +1,8 @@
 # 使用官方的 Ubuntu 镜像作为基础镜像
 FROM ubuntu:latest
 
+ARG AKSK
+
 # 避免在安装过程中出现交互式提示
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -12,7 +14,7 @@ WORKDIR /app
 
 # 复制当前目录下的文件和文件夹到工作目录
 COPY . /app
-RUN pwd && sed -i '$d' config.yaml && echo "aksk: \"Bearer $AKSK\"" >> config.yaml
+RUN AKSK=$(cat /run/secrets/mysecret) && sed -i '$d' config.yaml && echo "aksk: \"Bearer $AKSK\"" >> config.yaml
 
 # 确保 /app 目录有足够的权限
 RUN chmod -R 755 /app
