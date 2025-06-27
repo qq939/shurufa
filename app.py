@@ -8,7 +8,12 @@ app = Flask(__name__)
 app.jinja_env.globals.update(enumerate=enumerate)
 with open('config.yaml', 'r', encoding="utf-8") as f:
     config = yaml.safe_load(f)
-
+@app.route('/api/v1', methods=['GET'])
+def api():
+    # 如果前端通过 URL 参数传递 input_text，例如：/api/v1?input_text=你好
+    input_text = request.args.get('input_text', '')
+    result = aitools().api(input_text)
+    return result
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
